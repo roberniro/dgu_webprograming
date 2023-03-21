@@ -22,7 +22,7 @@
         align-items: center;
         color: white;
     }
-    .user .icon {
+    #icon {
         height: 70px;
         margin: 15px;
         border-radius: 50%;
@@ -33,7 +33,7 @@
         padding: 0;
         margin-right: 10px;
     }
-    .badge {
+    #badge {
         height: 15px;
         margin-right: 10px;
     }    
@@ -76,29 +76,29 @@
     .bt.direct {
         margin-right: auto;
     }
-    .reaction .like {
+    #like {
         font-size: 20px;
         margin: 10px;
         padding: 5px;
     }
-    .reaction .post_id {
+    #post_id {
         font-size: 20px;
         margin: 10px 0px 0px 10px;
         padding: 5px 0px 0px 5px ;
     }
-    .reaction .post_content {
+    #post_content {
         font-size: 20px;
         color:gray;
         margin: 10px 0px 0px 0px;
     }
-    .reaction .comments {
+    #comments {
         font-size: 20px;
         color:gray;
         margin-left: 10px;
         padding-left: 5px;
         padding-top: 3px;
     }
-    .reaction .date {
+    #date {
         font-size: 15px;
         color: gray;
         margin-left: 10px;
@@ -109,9 +109,9 @@
 </style>
 <body>
     <div class="sec user">
-        <img class="icon" src="data:image/jpeg;base64,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" alt="주여정">
+        <img id="icon" src="data:image/jpeg;base64,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" alt="주여정">
         <p class="id">Idh_sky</p>
-        <img class="badge" src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png" alt="certified">
+        <img id="badge" src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png" alt="certified">
         <div class="dot">&#183;</div>
         <button class="bt follow">팔로우</button>
         <button class="bt more">&#183;&#183;&#183;</button>
@@ -136,11 +136,11 @@
             </button>    
         </div>
         <div>
-            <div class="like">좋아요 181.3만개</div>
-            <span class="post_id">Idh_sky</span>
-            <span class="post_content">영광스러운 여정의 시작</span>
-            <div class="comments">댓글 9305개 모두 보기</div>
-            <div class="date">12월30, 2022</div>
+            <div id="like">좋아요 181.3만개</div>
+            <span id="post_id">Idh_sky</span>
+            <span id="post_content">영광스러운 여정의 시작</span>
+            <div id="comments">댓글 9305개 모두 보기</div>
+            <div id="date">12월30, 2022</div>
         </div>
         <div>
     </div>
