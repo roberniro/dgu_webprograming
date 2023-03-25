@@ -74,7 +74,7 @@ body {
 }
 
 .floating {
-  width: 300px;
+  width: calc(1200px*0.25);
   height: fit-content;
   display: flex;
   flex-direction: column;
@@ -103,7 +103,7 @@ body {
 }
 
 .main {
-  width: 700px;
+  width: 60%;
   background-color: #b4b4b4;
   padding: 20px;
   border: 10px solid #333;

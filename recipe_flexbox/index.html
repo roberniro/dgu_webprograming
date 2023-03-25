@@ -130,10 +130,13 @@
 
         <script>
             let changeWidth = () => {
-                var element = document.getElementById("root");
-                var currentWidth = parseInt(getComputedStyle(element).width);
+                var root = document.getElementById("root");
+                var currentWidth = parseInt(getComputedStyle(root).width);
                 console.log(currentWidth);
-                element.style.width = (currentWidth + 50) + 'px';
+                var newWidth = currentWidth + 50
+                root.style.width = newWidth + 'px';
+                var floating = document.querySelector(".floating");
+                floating.style.width = (newWidth * 0.25) + 'px'
             };
 
             let changeBgColor = () => {
