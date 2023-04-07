@@ -51,6 +51,25 @@
     <button onclick="setTimeout(function () {document.getElementsByTagName('h1')[0].innerHTML='잘가' }, 3000)">인사</button>
     <br>
   </div>
+  <div>
+    <h1>고추장찌개 레시피</h1>
+    <button onclick="setTimeout(function () {
+      document.getElementsByTagName('h1')[1].innerHTML='<i>백종원</i>찌개 레시피'; 
+      setTimeout(function () {
+        document.getElementsByTagName('h1')[1].innerHTML=`<i style='color: red'>백종원</i>찌개 레시피`; 
+      }, 3000)
+      }, 3000)">
+      3초, 3초
+    </button>
+    <button onclick="setTimeout(function () {
+        document.getElementsByTagName('h1')[1].innerHTML='<i>백종원</i>찌개 레시피'
+        }, 3000);
+      setTimeout(function () {
+        document.getElementsByTagName('h1')[1].innerHTML=`<i style='color: red'>백종원</i>찌개 레시피`
+      }, 6000)">
+      3초, 6초
+    </button>
+  </div>
   <form>
     <input type="radio" id="male" , name="gender">
     <label class="radio" for="male">male</label>
