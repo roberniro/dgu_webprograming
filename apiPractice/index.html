@@ -1,0 +1,67 @@
+<!-- 
+  정상일반인증키54416e584164656e39387a5550424c
+  http://openapi.seoul.go.kr:8088/54416e584164656e39387a5550424c/json/RealtimeCityAir/1/25
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script>
+    function load() {
+      const con = confirm("데이터를 불러오시겠습니까?");
+      if (con === false) {
+        console.error("데이터를 안 불러옵니다.");
+        return;
+      }
+      fetch("http://openapi.seoul.go.kr:8088/54416e584164656e39387a5550424c/json/RealtimeCityAir/1/25").then(
+        function (res) {
+          res.json().then(function (res2) {
+            alert(res2.RealtimeCityAir.RESULT.MESSAGE);
+            alert(res2.RealtimeCityAir.row[0].MSRSTE_NM + "에 오신 것을 환영합니다")
+            let result = '';
+            for (let i = 0; i < 25; i++) {
+              result += `
+                <tr ${i != 24 && res2.RealtimeCityAir.row[i].MSRRGN_NM !== res2.RealtimeCityAir.row[i + 1].MSRRGN_NM ? 'style="border-width: 0px 0px 5px 0px; border-color: black; border-style: solid;"' : ''}>
+                  <td>${res2.RealtimeCityAir.row[i].MSRSTE_NM}</td>
+                  <td>${res2.RealtimeCityAir.row[i].PM10}</td>
+                  <td>${res2.RealtimeCityAir.row[i].PM25}</td>
+                  <td>${res2.RealtimeCityAir.row[i].O3}</td>
+                  <td>${res2.RealtimeCityAir.row[i].SO2}</td>
+                </tr>
+                `;
+            }
+            document.getElementById('data').innerHTML = result;
+          })
+          console.log(res);
+        });
+      console.log("데이터를 불러옵니다");
+    }
+  </script>
+  <style>
+    table {
+      border: 1px black solid;
+    }
+  </style>
+</head>
+
+<body>
+  <button onclick="load()">데이터 불러오기</button>
+  <table>
+    <thead>
+      <th>지역명</th>
+      <th>PM10</th>
+      <th>PM25</th>
+      <th>O3</th>
+      <th>SO2</th>
+    </thead>
+    <tbody id="data">
+    </tbody>
+  </table>
+</body>
+
+</html>
