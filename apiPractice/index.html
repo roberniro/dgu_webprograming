@@ -1,8 +1,3 @@
-<!-- 
-  정상일반인증키54416e584164656e39387a5550424c
-  http://openapi.seoul.go.kr:8088/54416e584164656e39387a5550424c/json/RealtimeCityAir/1/25
--->
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,6 +8,27 @@
   <title>Document</title>
   <script>
     function load() {
+      function dataSort(index, data) {
+        myClass = 'class="'
+        if (index != 24 && data[index].MSRRGN_NM !== data[index + 1].MSRRGN_NM) { myClass += 'district_border ' }
+        if (data[index].IDEX_NM == '보통') { myClass += 'color_normal ' }
+        else if (data[index].IDEX_NM == '좋음') { myClass += 'color_good ' }
+        else { myClass += 'color_bad' }
+        myClass += '"'
+        return myClass
+      }
+
+      function getMvlColor(mvl, sortedData) {
+        const index = sortedData.findIndex(item => item.IDEX_MVL === mvl);
+        if (index < 5) {
+          return 'mvl_bad';
+        }
+        if (index > 19) {
+          return 'mvl_good';
+        }
+        return '';
+      }
+
       const con = confirm("데이터를 불러오시겠습니까?");
       if (con === false) {
         console.error("데이터를 안 불러옵니다.");
@@ -22,17 +38,21 @@
         function (res) {
           res.json().then(function (res2) {
             alert(res2.RealtimeCityAir.RESULT.MESSAGE);
-            alert(res2.RealtimeCityAir.row[0].MSRSTE_NM + "에 오신 것을 환영합니다")
+            let data = res2.RealtimeCityAir.row;
+            let sortedData = [...data];
+            sortedData.sort((a, b) => b.IDEX_MVL - a.IDEX_MVL)
             let result = '';
             for (let i = 0; i < 25; i++) {
+              let mvl = data[i].IDEX_MVL;
               result += `
-                <tr ${i != 24 && res2.RealtimeCityAir.row[i].MSRRGN_NM !== res2.RealtimeCityAir.row[i + 1].MSRRGN_NM ? 'style="border-width: 0px 0px 5px 0px; border-color: black; border-style: solid;"' : ''}>
-                  <td>${res2.RealtimeCityAir.row[i].MSRSTE_NM}</td>
-                  <td>${res2.RealtimeCityAir.row[i].PM10}</td>
-                  <td>${res2.RealtimeCityAir.row[i].PM25}</td>
-                  <td>${res2.RealtimeCityAir.row[i].O3}</td>
-                  <td>${res2.RealtimeCityAir.row[i].SO2}</td>
-                </tr>
+                <tr ${dataSort(i, data)}>
+                  <td>${data[i].MSRSTE_NM != 0 ? data[i].MSRSTE_NM : '-'}</td>
+                  <td>${data[i].PM10 != 0 ? data[i].PM10 : '-'}</td>
+                  <td>${data[i].PM25 != 0 ? data[i].PM25 : '-'}</td>
+                  <td>${data[i].O3 != 0 ? data[i].O3 : '-'}</td>
+                  <td>${data[i].SO2 != 0 ? data[i].SO2 : '-'}</td>
+                  <td class=${getMvlColor(mvl, sortedData)}>${data[i].IDEX_MVL != 0 ? data[i].IDEX_MVL : '-'}</td>
+                </tr >
                 `;
             }
             document.getElementById('data').innerHTML = result;
@@ -43,25 +63,104 @@
     }
   </script>
   <style>
+    body {
+      background: #eee;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100vw;
+      max-width: 400px;
+    }
+
+    button {
+      padding: 5px 10px;
+      border: 2px #0d6efd solid;
+      border-radius: 10px;
+      margin: 5px 0px;
+      color: white;
+      background-color: #0d6efd;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    button:hover {
+      color: #0d6efd;
+      background-color: white;
+    }
+
     table {
-      border: 1px black solid;
+      width: 100%;
+      border: 3px #0d6efd solid;
+      border-spacing: 0px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th {
+      border: 1px #0d6efd solid;
+      text-align: center;
+      padding: 4px 8px;
+      color: white;
+      background-color: #0d6efd;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    td {
+      border: 0px white solid;
+      text-align: center;
+      padding: 3px;
+      color: rgb(57, 57, 57);
+    }
+
+    .district_border td {
+      border-width: 0px 0px 5px 0px;
+      border-color: #0d6efd;
+      border-style: solid;
+    }
+
+    .color_normal {
+      background-color: rgb(162, 255, 69);
+    }
+
+    .color_good {
+      background-color: rgb(59, 202, 250);
+    }
+
+    .color_bad {
+      background-color: rgb(255, 126, 126);
+    }
+
+    .mvl_bad {
+      color: red;
+      font-weight: bold;
+    }
+
+    .mvl_good {
+      color: blue;
+      font-weight: bold;
     }
   </style>
 </head>
 
 <body>
-  <button onclick="load()">데이터 불러오기</button>
-  <table>
-    <thead>
-      <th>지역명</th>
-      <th>PM10</th>
-      <th>PM25</th>
-      <th>O3</th>
-      <th>SO2</th>
-    </thead>
-    <tbody id="data">
-    </tbody>
-  </table>
+  <div class="container">
+    <button onclick="load()">데이터 불러오기</button>
+    <table>
+      <thead>
+        <th>지역명</th>
+        <th>PM10</th>
+        <th>PM25</th>
+        <th>O3</th>
+        <th>SO2</th>
+        <th>MVL</th>
+      </thead>
+      <tbody id="data">
+      </tbody>
+    </table>
+  </div>
 </body>
 
 </html>
