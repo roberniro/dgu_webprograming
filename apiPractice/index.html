@@ -7,17 +7,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <script>
-    function load() {
-      function dataSort(index, data) {
-        myClass = 'class="'
-        if (index != 24 && data[index].MSRRGN_NM !== data[index + 1].MSRRGN_NM) { myClass += 'district_border ' }
-        if (data[index].IDEX_NM == '보통') { myClass += 'color_normal ' }
-        else if (data[index].IDEX_NM == '좋음') { myClass += 'color_good ' }
-        else { myClass += 'color_bad' }
-        myClass += '"'
-        return myClass
+    async function load() {
+      function getDistrictBorder(index, data) {
+        if (index != 24 && data[index].MSRRGN_NM !== data[index + 1].MSRRGN_NM) return "district_border";
+        return "";
       }
-
+      function getIndexColor(index, data) {
+        if (data[index].IDEX_NM == '보통') return "color_normal";
+        if (data[index].IDEX_NM == '좋음') return "color_good";
+        if (data[index].IDEX_NM == '나쁨') return "color_bad";
+        return "color_verybad";
+      }
       function getMvlColor(mvl, sortedData) {
         const index = sortedData.findIndex(item => item.IDEX_MVL === mvl);
         if (index < 5) {
@@ -34,42 +34,93 @@
         console.error("데이터를 안 불러옵니다.");
         return;
       }
-      fetch("http://openapi.seoul.go.kr:8088/54416e584164656e39387a5550424c/json/RealtimeCityAir/1/25").then(
-        function (res) {
-          res.json().then(function (res2) {
-            alert(res2.RealtimeCityAir.RESULT.MESSAGE);
-            let data = res2.RealtimeCityAir.row;
-            let sortedData = [...data];
-            sortedData.sort((a, b) => b.IDEX_MVL - a.IDEX_MVL)
-            let result = '';
-            for (let i = 0; i < 25; i++) {
-              let mvl = data[i].IDEX_MVL;
-              result += `
-                <tr ${dataSort(i, data)}>
-                  <td>${data[i].MSRSTE_NM != 0 ? data[i].MSRSTE_NM : '-'}</td>
-                  <td>${data[i].PM10 != 0 ? data[i].PM10 : '-'}</td>
-                  <td>${data[i].PM25 != 0 ? data[i].PM25 : '-'}</td>
-                  <td>${data[i].O3 != 0 ? data[i].O3 : '-'}</td>
-                  <td>${data[i].SO2 != 0 ? data[i].SO2 : '-'}</td>
-                  <td class=${getMvlColor(mvl, sortedData)}>${data[i].IDEX_MVL != 0 ? data[i].IDEX_MVL : '-'}</td>
-                </tr >
-                `;
+      const res = await fetch("http://openapi.seoul.go.kr:8088/54416e584164656e39387a5550424c/json/RealtimeCityAir/1/25");
+      const res2 = await res.json();
+      alert(res2.RealtimeCityAir.RESULT.MESSAGE);
+      let data = res2.RealtimeCityAir.row;
+      let sortedData = [...data];
+      sortedData.sort((a, b) => b.IDEX_MVL - a.IDEX_MVL);
+      let result = '';
+      let pm10_Data = [];
+      let pm25_Data = [];
+      let label = [];
+      for (let i = 0; i < 25; i++) {
+        pm10_Data.push(data[i].PM10);
+        pm25_Data.push(data[i].PM25);
+        label.push(data[i].MSRSTE_NM);
+        let mvl = data[i].IDEX_MVL;
+        result += `
+          <tr class=${getDistrictBorder(i, data)}>
+            <td>${data[i].MSRSTE_NM != 0 ? data[i].MSRSTE_NM : '-'}</td>
+            <td class=${getIndexColor(i, data)}>${data[i].IDEX_NM != '' ? data[i].IDEX_NM : '-'}</td>
+            <td>${data[i].PM10 != 0 ? data[i].PM10 : '-'}</td>
+            <td>${data[i].PM25 != 0 ? data[i].PM25 : '-'}</td>
+            <td>${data[i].O3 != 0 ? data[i].O3 : '-'}</td>
+            <td>${data[i].SO2 != 0 ? data[i].SO2 : '-'}</td>
+            <td class=${getMvlColor(mvl, sortedData)}>${data[i].IDEX_MVL != 0 ? data[i].IDEX_MVL : '-'}</td>
+          </tr>
+        `;
+      }
+      document.getElementById('data').innerHTML = result;
+
+      const ctx1 = document.getElementById('myChart1');
+
+      new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: label,
+          datasets: [{
+            label: 'PM10',
+            data: pm10_Data,
+            borderWidth: 1
+
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
             }
-            document.getElementById('data').innerHTML = result;
-          })
-          console.log(res);
-        });
-      console.log("데이터를 불러옵니다");
+          }
+        }
+      });
+
+      const ctx2 = document.getElementById('myChart2');
+
+      new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: label,
+          datasets: [{
+            label: 'PM25',
+            data: pm25_Data,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
     }
+    console.log("데이터를 불러옵니다");
   </script>
+
+  <script src="chart.js"></script>
+
   <style>
     body {
       background: #eee;
       display: flex;
       justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
     }
 
-    .container {
+    .data_container {
       width: 100vw;
       max-width: 400px;
     }
@@ -92,10 +143,11 @@
 
     table {
       width: 100%;
-      border: 3px #0d6efd solid;
+      border: 5px #0d6efd solid;
       border-spacing: 0px;
       border-radius: 10px;
       overflow: hidden;
+      background-color: white;
     }
 
     th {
@@ -111,7 +163,7 @@
     td {
       border: 0px white solid;
       text-align: center;
-      padding: 3px;
+      padding: 3px 0px;
       color: rgb(57, 57, 57);
     }
 
@@ -122,15 +174,19 @@
     }
 
     .color_normal {
-      background-color: rgb(162, 255, 69);
+      color: greenyellow;
     }
 
     .color_good {
-      background-color: rgb(59, 202, 250);
+      color: green;
     }
 
     .color_bad {
-      background-color: rgb(255, 126, 126);
+      color: orange;
+    }
+
+    .color_verybad {
+      color: red;
     }
 
     .mvl_bad {
@@ -142,15 +198,27 @@
       color: blue;
       font-weight: bold;
     }
+
+    .chart_container {
+      width: 100vw;
+      max-width: 600px;
+    }
+
+    @media screen and (max-width: 600px) {
+      .chart_container {
+        max-width: 400px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div class="container">
+  <div class="data_container">
     <button onclick="load()">데이터 불러오기</button>
     <table>
       <thead>
         <th>지역명</th>
+        <th>지수</th>
         <th>PM10</th>
         <th>PM25</th>
         <th>O3</th>
@@ -161,6 +229,15 @@
       </tbody>
     </table>
   </div>
+
+  <div class="chart_container">
+    <canvas id="myChart1"></canvas>
+    <canvas id="myChart2"></canvas>
+  </div>
+
+  <script>
+
+  </script>
 </body>
 
 </html>
